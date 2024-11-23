@@ -1,0 +1,195 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ngempela Music - Music</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="bg-gray-900 text-white font-sans">
+    <!-- Header -->
+    <header class="py-6 bg-gradient-to-r from-purple-800 via-black to-blue-800 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-4xl font-extrabold">Ngempela Music Production</h1>
+            <nav>
+                <ul class="flex space-x-4 text-lg">
+                    <li><a href="{% url 'home' %}" class="hover:text-blue-500">Home</a></li>
+                    <li><a href="{% url 'about' %}" class="hover:text-blue-500">About</a></li>
+                    <li><a href="{% url 'ngempela' %}" class="text-blue-400">Music</a></li>
+                    <li><a href="{% url 'contact' %}" class="hover:text-blue-500">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-10">
+        <!-- Music Collection -->
+        <section class="mt-10">
+            <h2 class="text-3xl font-bold text-center mb-8">Music Collection</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for track in tracks %}
+                <div class="bg-gray-800 p-4 rounded-lg shadow-lg hover:scale-105 transition transform duration-300 items-center text-center">
+                    <h3 class="text-xl font-semibold mb-2">{{ track.title }}</h3>
+                    <p class="text-gray-400 mb-4">Artist: {{ track.artist }}</p>
+                    <button 
+                        class="justify-between items-center w-full text-center bg-purple-700 hover:bg-purple-500 text-white py-2 px-4 rounded-lg"
+                        onclick="addToPlaylist('{{ track.file.url }}', '{{ track.title|escapejs }}')">
+                        Add to Playlist
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Music Player -->
+            <div class="bg-gray-900 p-6 rounded-lg shadow-lg mt-10">
+                <h3 class="text-xl font-bold text-center text-indigo-300">Now Playing</h3>
+                <audio id="music-player" class="w-full mt-4" controls>
+                    <source id="audio-source" src="" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <p id="current-track" class="text-center text-gray-400 mt-4">No track selected</p>
+                <div class="mt-4 flex justify-center space-x-4">
+                    <button onclick="playPrevious()" class="bg-purple-700 hover:bg-purple-500 text-white py-2 px-4 rounded-lg">Previous</button>
+                    <button onclick="play()" class="bg-blue-700 hover:bg-blue-500 text-white py-2 px-4 rounded-lg">Play</button>
+                    <button onclick="pause()" class="bg-yellow-500 hover:bg-yellow-400 text-white py-2 px-4 rounded-lg">Pause</button>
+                    <button onclick="stop()" class="bg-red-700 hover:bg-red-500 text-white py-2 px-4 rounded-lg">Stop</button>
+                    <button onclick="playNext()" class="bg-purple-700 hover:bg-purple-500 text-white py-2 px-4 rounded-lg">Next</button>
+                    <button onclick="shufflePlaylist()" class="bg-green-700 hover:bg-green-500 text-white py-2 px-4 rounded-lg">Shuffle</button>
+                    <button onclick="toggleRepeat()" id="repeat-btn" class="bg-indigo-700 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg">Repeat: Off</button>
+                    <button onclick="clearPlaylist()" class="bg-gray-700 hover:bg-gray-500 text-white py-2 px-4 rounded-lg">Clear Playlist</button>
+                </div>
+                
+                <h4 class="text-lg font-semibold text-indigo-300">Playlist:</h4>
+                <div id="playlist" class="mt-4">
+                    <ul id="playlist-tracks" class="list-none"></ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-6 bg-gradient-to-r from-blue-800 via-black to-purple-800 text-center">
+        <p>&copy; 2024 Ngempela Music. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        let playlist = [];
+        let currentTrackIndex = 0;
+        let isRepeatOn = false;
+
+        const musicPlayer = document.getElementById('music-player');
+        const audioSource = document.getElementById('audio-source');
+        const currentTrack = document.getElementById('current-track');
+        const playlistElement = document.getElementById('playlist');
+        const repeatButton = document.getElementById('repeat-btn');
+
+        // Play a specific track
+        function playTrack(index = currentTrackIndex) {
+            if (playlist.length === 0) {
+                currentTrack.textContent = "Playlist is empty.";
+                return;
+            }
+            currentTrackIndex = index;
+            const track = playlist[currentTrackIndex];
+            audioSource.src = track.trackUrl;
+            musicPlayer.load();
+            musicPlayer.play();
+            currentTrack.textContent = `Now Playing: ${track.trackTitle}`;
+        }
+
+        // Play the current or first track
+        function play() {
+            if (playlist.length === 0) {
+                currentTrack.textContent = "Playlist is empty. Add a track to play.";
+                return;
+            }
+            if (!audioSource.src || audioSource.src === window.location.href) {
+                playTrack(0); // Play the first track if none is loaded
+            } else {
+                musicPlayer.play();
+            }
+        }
+
+        // Pause the current track
+        function pause() {
+            musicPlayer.pause();
+            currentTrack.textContent = `Paused: ${playlist[currentTrackIndex]?.trackTitle || "No track selected"}`;
+        }
+
+        // Stop the current track
+        function stop() {
+            musicPlayer.pause();
+            musicPlayer.currentTime = 0; // Reset to the beginning
+            currentTrack.textContent = "Playback stopped.";
+        }
+
+        // Play the next track
+        function playNext() {
+            if (playlist.length === 0) {
+                currentTrack.textContent = "Playlist is empty.";
+                return;
+            }
+            currentTrackIndex = (currentTrackIndex + 1) % playlist.length; // Loop back to the start
+            playTrack(currentTrackIndex);
+        }
+
+        // Play the previous track
+        function playPrevious() {
+            if (playlist.length === 0) {
+                currentTrack.textContent = "Playlist is empty.";
+                return;
+            }
+            currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length; // Loop back to the end
+            playTrack(currentTrackIndex);
+        }
+
+        // Shuffle the playlist
+        function shufflePlaylist() {
+            if (playlist.length === 0) {
+                currentTrack.textContent = "Playlist is empty.";
+                return;
+            }
+            currentTrackIndex = Math.floor(Math.random() * playlist.length); // Pick a random track
+            playTrack(currentTrackIndex);
+        }
+
+        // Toggle Repeat Mode
+        function toggleRepeat() {
+            isRepeatOn = !isRepeatOn;
+            repeatButton.textContent = `Repeat: ${isRepeatOn ? "On" : "Off"}`;
+        }
+
+        // Auto-play next track or repeat
+        musicPlayer.addEventListener('ended', () => {
+            if (isRepeatOn) {
+                playTrack(currentTrackIndex); // Replay the current track
+            } else {
+                playNext();
+            }
+        });
+
+        // Clear the playlist
+        function clearPlaylist() {
+            playlist = [];
+            currentTrackIndex = 0;
+            playlistElement.innerHTML = ""; // Clear the displayed playlist
+            stop(); // Stop the current track
+            currentTrack.textContent = "Playlist cleared.";
+        }
+
+        // Add a track to the playlist
+        function addToPlaylist(trackUrl, trackTitle) {
+            playlist.push({ trackUrl, trackTitle });
+            const li = document.createElement('li');
+            li.textContent = trackTitle;
+            li.classList.add('text-gray-400', 'mb-2', 'cursor-pointer', 'hover:text-blue-400');
+            li.onclick = () => playTrack(playlist.findIndex((track) => track.trackUrl === trackUrl));
+            playlistElement.appendChild(li);
+        }
+    </script>
+</body>
+</html>
+

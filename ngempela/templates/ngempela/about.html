@@ -1,0 +1,90 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us</title>
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Header -->
+    <header class="py-6 bg-gradient-to-r from-purple-800 via-black to-blue-800 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-4xl font-extrabold">Ngempela Music Production</h1>
+            <nav>
+                <ul class="flex space-x-4 text-lg">
+                    <li><a href="{% url 'home' %}" class="hover:text-blue-500">Home</a></li>
+                    <li><a href="{% url 'about' %}" class="text-blue-400">About</a></li>
+                    <li><a href="{% url 'ngempela' %}" class="hover:text-blue-500">Music</a></li>
+                    <li><a href="{% url 'contact' %}" class="hover:text-blue-500">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <!-- Header -->
+    <header class="bg-purple-800 text-center py-6">
+        <h1 class="text-4xl font-bold">About Us</h1>
+        <p class="text-lg mt-2">Discover who we are and what we do</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-6 space-y-10">
+        <!-- Mission Section -->
+        <section class="text-center">
+            <h2 class="text-3xl font-bold mb-4">Our Mission</h2>
+            <p class="text-gray-400 text-lg">
+                At Ngempela Music Productions, our mission is to create soul-stirring music that resonates with the hearts of our listeners. We believe in the transformative power of music and its ability to bring people together.
+            </p>
+        </section>
+
+        <!-- History Section -->
+        <section class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold mb-4">Our Story</h2>
+            <p class="text-gray-400 text-lg">
+                Ngempela Music Productions was founded in 2020 by a group of passionate musicians and producers. Over the years, we’ve grown into a full-fledged production company dedicated to creating original music that represents our culture and creativity.
+            </p>
+        </section>
+
+        <!-- Team Section -->
+        <section>
+            <h2 class="text-3xl font-bold text-center mb-6">Meet the Team</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Team Member 1 -->
+                <div class="bg-gray-800 p-4 rounded-lg shadow-lg text-center">
+                    <img src="{% static 'images/NkanyisoNgempela.jpg' %}" alt="Team Member" class="w-24 h-24 mx-auto rounded-full mb-4">
+                    <h3 class="text-xl font-semibold">Thando Mkhize</h3>
+                    <p class="text-gray-400">Founder & Producer</p>
+                </div>
+                <!-- Team Member 2 -->
+                <div class="bg-gray-800 p-4 rounded-lg shadow-lg text-center">
+                    <img src="{% static 'images/nfkbathingwileimage.jpg' %}" alt="Team Member" class="w-24 h-24 mx-auto rounded-full mb-4">
+                    <h3 class="text-xl font-semibold">Lerato Ndlovu</h3>
+                    <p class="text-gray-400">Vocalist & Songwriter</p>
+                </div>
+                <!-- Team Member 3 -->
+                <div class="bg-gray-800 p-4 rounded-lg shadow-lg text-center">
+                    <img src="{% static 'images/NkanyisoNgempela4.jpg' %}" alt="Team Member" class="w-24 h-24 mx-auto rounded-full mb-4">
+                    <h3 class="text-xl font-semibold">Sibusiso Dlamini</h3>
+                    <p class="text-gray-400">Sound Engineer</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Values Section -->
+        <section class="text-center">
+            <h2 class="text-3xl font-bold mb-4">Our Values</h2>
+            <p class="text-gray-400 text-lg">
+                Creativity, Authenticity, and Excellence are the pillars that guide us in every note we produce.
+            </p>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-center py-6 mt-10">
+        <p>&copy; 2024 Ngempela Music Productions. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+
